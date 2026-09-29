@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="robots" content="noindex,nofollow">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DCG — CRM Central</title>
+<style>
+:root{--azul:#1565A8;--azul-esc:#0d4a80;--claro:#eaf2fa;--laranja:#f39c12;--borda:#d9e2ec;--texto:#22303f;--fundo:#f5f7fa}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,'Segoe UI',Roboto,Arial,sans-serif;background:var(--fundo);color:var(--texto)}
+button{cursor:pointer;font-family:inherit}
+input,select,textarea{font-family:inherit;font-size:14px;padding:9px 11px;border:1px solid var(--borda);border-radius:8px;width:100%;background:#fff}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--azul);border-color:var(--azul)}
+.btn{background:var(--azul);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600}
+.btn:hover{background:var(--azul-esc)}
+.btn2{background:#fff;color:var(--azul);border:1px solid var(--azul);border-radius:8px;padding:9px 14px;font-size:13px;font-weight:600}
+.btn3{background:var(--laranja);color:#fff;border:none;border-radius:8px;padding:10px 16px;font-size:14px;font-weight:600}
+.btn-sm{padding:5px 10px;font-size:12px;border-radius:6px}
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--azul-esc),var(--azul))}
+.login-card{background:#fff;border-radius:16px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-card .logo{font-size:26px;font-weight:800;color:var(--azul);margin-bottom:2px}
+.login-card .sub{color:#68788c;font-size:13px;margin-bottom:26px}
+.login-card label{font-size:12px;font-weight:700;color:#5a6b7e;display:block;margin:14px 0 5px;text-transform:uppercase;letter-spacing:.4px}
+.erro{background:#fdecea;color:#b3261e;padding:10px;border-radius:8px;font-size:13px;margin-top:12px;display:none}
+/* APP */
+#app{display:none;min-height:100vh}
+.top{background:var(--azul);color:#fff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.top .brand{font-weight:800;font-size:17px}
+.top .user{font-size:13px;display:flex;align-items:center;gap:12px}
+.top .user button{background:rgba(255,255,255,.15);color:#fff;border:none;border-radius:6px;padding:6px 12px;font-size:12px}
+.wrap{display:flex;min-height:calc(100vh - 55px)}
+.menu{width:190px;background:#fff;border-right:1px solid var(--borda);padding:16px 10px;flex-shrink:0}
+.menu button{display:block;width:100%;text-align:left;background:none;border:none;padding:11px 12px;border-radius:8px;font-size:14px;color:#43566c;font-weight:500;margin-bottom:2px}
+.menu button.on{background:var(--claro);color:var(--azul);font-weight:700}
+.menu button:hover{background:var(--claro)}
+.main{flex:1;padding:24px;max-width:1200px}
+h1{font-size:21px;margin-bottom:4px}
+.subt{color:#68788c;font-size:13px;margin-bottom:20px}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:22px}
+.card{background:#fff;border:1px solid var(--borda);border-radius:12px;padding:16px}
+.card .n{font-size:26px;font-weight:800;color:var(--azul)}
+.card .l{font-size:12px;color:#68788c;margin-top:2px}
+.card .v{font-size:20px;font-weight:800;color:#1c7f3c}
+/* tabelas */
+.tbl{background:#fff;border:1px solid var(--borda);border-radius:12px;overflow:auto}
+table{width:100%;border-collapse:collapse;font-size:13.5px}
+th{background:var(--claro);text-align:left;padding:10px 12px;font-size:11.5px;text-transform:uppercase;letter-spacing:.4px;color:#3d5068;white-space:nowrap}
+td{padding:10px 12px;border-top:1px solid #eef2f7;vertical-align:top}
+tr.row{cursor:pointer}tr.row:hover{background:#f4f8fd}
+.badge{display:inline-block;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:700;white-space:nowrap}
+.b-PROSPECCAO{background:#e8eef6;color:#3d5068}.b-COTACAO{background:#e3f2fd;color:#1565A8}
+.b-PROPOSTA{background:#e5e0fa;color:#5b4dbb}.b-EM_NEGOCIACAO{background:#fff3d6;color:#9a6b00}
+.b-FECHADO{background:#e0f2e4;color:#1c7f3c}.b-PARCEIRO{background:#e0e9e4;color:#3a6b52}
+.b-REUNIAO{background:#dceff7;color:#0d4a80}.b-PERDIDO{background:#fdeaea;color:#b3261e}
+.b-FORNECEDOR{background:#eee;color:#555}.b-ATIVO,.b-ATIVA,.b-REATIVADO{background:#e2f4ea;color:#1c7f3c}.b-EX-CLIENTE,.b-INATIVO,.b-BAIXADA,.b-INAPTA,.b-SUSPENSA{background:#eee;color:#777}.b-AGUARDANDO_CONTEXTO{background:#f0f0f0;color:#888}
+.filtros{display:flex;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.filtros input,.filtros select{width:auto;min-width:150px}
+.filtros .busca{flex:1;min-width:200px}
+/* ficha */
+.overlay{position:fixed;inset:0;background:rgba(15,30,45,.45);z-index:100;display:none;align-items:flex-start;justify-content:center;overflow-y:auto;padding:30px 14px}
+.modal{background:#fff;border-radius:14px;width:100%;max-width:760px;padding:26px}
+.modal h2{font-size:18px;color:var(--azul);margin-bottom:2px}
+.fechar{float:right;background:none;border:none;font-size:22px;color:#8a9aae}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.f label{font-size:11px;font-weight:700;color:#5a6b7e;display:block;margin:10px 0 4px;text-transform:uppercase}
+.nota-box{background:#f6f9fd;border:1px solid var(--borda);border-radius:10px;padding:10px;display:flex;gap:8px;margin:10px 0}
+.hist{margin-top:10px;max-height:240px;overflow-y:auto}
+.hist .it{border-left:3px solid var(--azul);padding:6px 10px;background:#fafcff;font-size:13px;margin-bottom:6px;border-radius:0 8px 8px 0}
+.hist .it small{color:#68788c;display:block}
+/* tarefa */
+.checar{width:17px;height:17px;cursor:pointer;accent-color:var(--azul)}
+.prio{font-size:10.5px;font-weight:800;padding:2px 7px;border-radius:10px}
+.p-alta{background:#fdecea;color:#b3261e}.p-media{background:#fff3d6;color:#9a6b00}.p-baixa{background:#e8eef6;color:#3d5068}
+.t-done{text-decoration:line-through;color:#98a5b4}
+.msg-ok{background:#e0f2e4;color:#1c7f3c;padding:9px 12px;border-radius:8px;font-size:13px;margin:10px 0;display:none}
+.msg-err{background:#fdecea;color:#b3261e;padding:9px 12px;border-radius:8px;font-size:13px;margin:10px 0;display:none}
+.loading{padding:30px;text-align:center;color:#8a9aae;font-size:13px}
+.vazio{padding:26px;text-align:center;color:#98a5b4;font-size:13px}
+@media(max-width:720px){.menu{width:56px}.menu button{font-size:0;padding:11px 6px;text-align:center}.menu button::before{content:'◆';font-size:16px}.grid2{grid-template-columns:1fr}.main{padding:14px}}
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login">
+  <div class="login-card">
+    <div class="logo">DCG · CRM Central</div>
+    <div class="sub">Painel de negócios — acesso restrito</div>
+    <form onsubmit="fazerLogin(event)">
+      <label>E-mail</label>
+      <input id="login-email" type="email" autocomplete="username" required>
+      <label>Senha</label>
+      <input id="login-pass" type="password" autocomplete="current-password" required>
+      <div style="margin-top:20px"><button class="btn" style="width:100%" type="submit">Entrar</button></div>
+      <div class="erro" id="login-erro"></div>
+    </form>
+  </div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="top">
+    <div class="brand">DCG · CRM Central</div>
+    <div class="user"><span id="user-nome"></span><button onclick="logout()">Sair</button></div>
+  </div>
+  <div class="wrap">
+    <div class="menu">
+      <button id="m-dash" onclick="pagina('dash')">📊 Painel</button>
+      <button id="m-neg" onclick="pagina('neg')">💼 Negócios</button>
+      <button id="m-tar" onclick="pagina('tar')">✅ Tarefas</button>
+      <button id="m-novo" onclick="pagina('novo')">➕ Nova Entrada</button>
+      <button id="m-cfg" onclick="pagina('cfg')">⚙️ Minha Conta</button>
+    </div>
+    <div class="main" id="conteudo"></div>
+  </div>
+</div>
+
+<!-- FICHA MODAL -->
+<div class="overlay" id="overlay" onclick="if(event.target===this)fecharFicha()">
+  <div class="modal" id="ficha-conteudo"></div>
+</div>
+
+<script>
+const API = 'https://mxathygvqidwhdpdvsbu.supabase.co/functions/v1/crm';
+const STATUS = ['PROSPECCAO','COTACAO','PROPOSTA','EM_NEGOCIACAO','FECHADO','REUNIAO','PARCEIRO','PERDIDO','FORNECEDOR','AGUARDANDO_CONTEXTO'];
+const LABEL = {PROSPECCAO:'Prospecção',COTACAO:'Cotação',PROPOSTA:'Proposta',EM_NEGOCIACAO:'Em Negociação',FECHADO:'Fechado',REUNIAO:'Reunião',PARCEIRO:'Parceiro',PERDIDO:'Perdido',FORNECEDOR:'Fornecedor',AGUARDANDO_CONTEXTO:'Aguardando contexto',ATIVO:'Ativo',ATIVA:'Ativa','EX-CLIENTE':'Ex-cliente',INATIVO:'Inativo',BAIXADA:'Baixada',INAPTA:'Inapta',SUSPENSA:'Suspensa',REATIVADO:'Reativado'};
+let USER = null, TOKEN = localStorage.getItem('crm_token') || '';
+
+async function api(acao, dados){
+  const r = await fetch(API, {method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify(Object.assign({action:acao, token:TOKEN}, dados||{}))});
+  const j = await r.json();
+  if(!j.ok && j.error==='Sessão expirada'){ alert('Sessão expirada. Entre novamente.'); logout(); return {ok:false}; }
+  return j;
+}
+function esc2(s){return (s==null?'':String(s)).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function brl(v){if(v==null)return '—';return Number(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL',maximumFractionDigits:0})}
+function dt(s){if(!s)return '';try{const d=new Date(s);return d.toLocaleDateString('pt-BR')}catch(e){return s.slice(0,10)}}
+
+/* ---------- LOGIN ---------- */
+async function fazerLogin(ev){
+  ev.preventDefault();
+  const email = document.getElementById('login-email').value.trim().toLowerCase();
+  const pass = document.getElementById('login-pass').value;
+  document.getElementById('login-erro').style.display='none';
+  const j = await api('login', {email, password: pass});
+  if(!j.ok){const e=document.getElementById('login-erro');e.textContent=j.error||'E-mail ou senha inválidos';e.style.display='block';return}
+  TOKEN=j.token; USER=j.user; localStorage.setItem('crm_token',TOKEN);
+  entrarApp();
+}
+function logout(){TOKEN='';localStorage.removeItem('crm_token');location.reload()}
+function entrarApp(){
+  document.getElementById('login').style.display='none';
+  document.getElementById('app').style.display='block';
+  document.getElementById('user-nome').textContent = USER.nome.split(' ')[0] + (USER.perfil==='admin'?' · Admin':'');
+  pagina('dash');
+}
+async function iniciar(){
+  if(TOKEN){const j=await api('me');if(j.ok){USER=j.user;entrarApp();return}}
+  document.getElementById('login').style.display='flex';
+}
+const PAG={dash:'m-dash',neg:'m-neg',tar:'m-tar',novo:'m-novo',cfg:'m-cfg'};
+function pagina(p){
+  for(const k in PAG)document.getElementById(PAG[k]).classList.toggle('on',k===p);
+  if(p==='dash')loadDash();if(p==='neg')loadNeg();if(p==='tar')loadTar();if(p==='novo')loadNovo();if(p==='cfg')loadCfg();
+}
+
+/* ---------- DASHBOARD ---------- */
+async function loadDash(){
+  const c=document.getElementById('conteudo');c.innerHTML='<div class="loading">Carregando…</div>';
+  const j=await api('dashboard');
+  if(!j.ok){c.innerHTML='<div class="msg-err">Erro ao carregar.</div>';return}
+  const d=j.data;
+  let linhas='';
+  for(const s of STATUS){const t=d.statuses[s];if(t&&(t.n>0))linhas+=`<tr><td><span class="badge b-${s}">${LABEL[s]}</span></td><td>${t.n}</td><td>${brl(t.valor)}</td></tr>`}
+  c.innerHTML=`
+  <h1>📊 Painel</h1><div class="subt">Visão geral do pipeline — atualizado agora</div>
+  <div class="cards">
+    <div class="card"><div class="n">${d.pipeline_negocios}</div><div class="l">Negócios no pipeline</div></div>
+    <div class="card"><div class="n">${d.em_negociacao}</div><div class="l">Em Negociação</div></div>
+    <div class="card"><div class="n">${d.fechados}</div><div class="l">Fechados</div></div>
+    <div class="card"><div class="v">${brl(d.valor_pipeline)}</div><div class="l">Pipeline ativo /mês</div></div>
+    <div class="card"><div class="v">${brl(d.valor_fechado)}</div><div class="l">Fechado /mês</div></div>
+    <div class="card"><div class="v">${brl(d.valor_carteira)}</div><div class="l">Carteira ativa /mês</div></div>
+    <div class="card"><div class="n">${d.tarefas_pendentes}</div><div class="l">Tarefas pendentes</div></div>
+  </div>
+  <div class="tbl"><table><tr><th>Status</th><th>Qtd.</th><th>Valor mensal somado</th></tr>${linhas}</table></div>
+  <div style="margin-top:18px"><button class="btn" onclick="pagina('neg')">Abrir Negócios →</button>
+  <button class="btn2" onclick="pagina('tar')" style="margin-left:8px">Ver Tarefas</button></div>`;
+}
+
+/* ---------- NEGÓCIOS ---------- */
+let filtros={busca:'',status:'',origem:'',pg:0};
+async function loadNeg(){
+  const c=document.getElementById('conteudo');
+  c.innerHTML=`<h1>💼 Negócios</h1><div class="subt">Clique numa linha para abrir a ficha e atualizar</div>
+  <div class="filtros">
+    <input class="busca" id="f-busca" placeholder="🔍 Buscar por nome, contato ou cidade…" value="${esc2(filtros.busca)}" onkeydown="if(event.key==='Enter'){filtros.busca=this.value;buscar()}">
+    <select id="f-status" onchange="filtros.status=this.value;buscar()">
+      <option value="">Todos os status</option>
+      ${STATUS.map(s=>`<option value="${s}" ${filtros.status===s?'selected':''}>${LABEL[s]}</option>`).join('')}
+    </select>
+    <select id="f-origem" onchange="filtros.origem=this.value;buscar()">
+      <option value="">Todas as origens</option>
+      <option value="parceria_luiz_gorresen_2026" ${filtros.origem==='parceria_luiz_gorresen_2026'?'selected':''}>Parceria Luiz</option>
+      <option value="manual_painel" ${filtros.origem==='manual_painel'?'selected':''}>Nova entrada manual</option>
+    </select>
+    <button class="btn" onclick="filtros.busca=document.getElementById('f-busca').value;buscar()">Buscar</button>
+  </div>
+  <div id="neg-lista"><div class="loading">Carregando…</div></div>`;
+  buscar();
+}
+async function buscar(pg){
+  if(pg!==undefined)filtros.pg=pg;
+  const el=document.getElementById('neg-lista');
+  const j=await api('list_clientes',{search:filtros.busca,status:filtros.status,origem:filtros.origem,limit:60,offset:filtros.pg*60});
+  if(!j.ok){el.innerHTML='<div class="msg-err">'+esc2(j.error||'Erro')+'</div>';return}
+  const rows=j.data.map(r=>`<tr class="row" onclick="abrirFicha('${r.id}')">
+    <td><b>${esc2(r.nome)}</b><br><small style="color:#8a9aae">${esc2(r.segmento||'')}</small></td>
+    <td>${esc2(r.contato_nome||'—')}<br><small style="color:#8a9aae">${esc2(r.contato_whatsapp||'')}</small></td>
+    <td>${esc2(r.cidade||'—')}</td>
+    <td><span class="badge b-${r.status}">${LABEL[r.status]||r.status||'—'}</span></td>
+    <td style="white-space:nowrap">${brl(r.valor_mensal)}</td>
+    <td>${esc2(r.responsavel||'—')}</td></tr>`).join('');
+  el.innerHTML=`<div class="tbl"><table><tr><th>Empresa / Lead</th><th>Contato</th><th>Cidade</th><th>Status</th><th>Valor/mês</th><th>Resp.</th></tr>
+    ${rows||'<tr><td colspan="6" class="vazio">Nada encontrado com esses filtros.</td></tr>'}</table></div>
+    <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+    ${filtros.pg>0?`<button class="btn2 btn-sm" onclick="buscar(${filtros.pg-1})">← Anterior</button>`:''}
+    <span style="font-size:12px;color:#8a9aae">Página ${filtros.pg+1} · ${j.total} registros</span>
+    ${j.has_more?`<button class="btn2 btn-sm" onclick="buscar(${filtros.pg+1})">Próxima →</button>`:''}</div>`;
+}
+
+/* ---------- FICHA ---------- */
+let FICHA=null;
+async function abrirFicha(id){
+  const j=await api('get_cliente',{id});
+  if(!j.ok){alert(j.error||'Erro');return}
+  FICHA=j.data;
+  const r=j.data.cliente, inters=j.data.interacoes||[], contratos=j.data.contratos||[];
+  const histHTML=inters.map(i=>`<div class="it"><small>${dt(i.data_interacao||i.created_at)} · ${esc2(i.tipo||'')} · ${esc2(i.responsavel||'')}</small>${esc2(i.descricao)}</div>`).join('');
+  const contHTML=contratos.map(k=>`<div class="it"><small>${esc2(k.operadora||'')} · ${esc2(k.produto_plano||'')} · ${brl(k.premio_mensal)}</small>${k.status_renovacao?'Renovação: '+esc2(k.status_renovacao):''}</div>`).join('');
+  document.getElementById('ficha-conteudo').innerHTML=`
+  <button class="fechar" onclick="fecharFicha()">×</button>
+  <h2>${esc2(r.nome)}</h2>
+  <div class="subt">${esc2(r.origem||'')} · criado ${dt(r.created_at)}</div>
+  <div class="msg-ok" id="ficha-ok"></div>
+  <div class="grid2 f">
+    <div><label>Status</label><select id="fx-status">${STATUS.map(s=>`<option value="${s}" ${r.status===s?'selected':''}>${LABEL[s]}</option>`).join('')}</select></div>
+    <div><label>Valor mensal (R$)</label><input id="fx-valor" type="number" step="0.01" value="${r.valor_mensal==null?'':r.valor_mensal}"></div>
+    <div><label>Responsável</label><select id="fx-resp"><option ${r.responsavel==='Diniz'?'selected':''}>Diniz</option><option ${r.responsavel==='Luiz'?'selected':''}>Luiz</option><option ${r.responsavel==='Diniz e Luiz'?'selected':''}>Diniz e Luiz</option><option>Tim</option></select></div>
+    <div><label>Contato / WhatsApp</label><input id="fx-wa" value="${esc2(r.contato_whatsapp||'')}"></div>
+    <div><label>Cidade</label><input id="fx-cidade" value="${esc2(r.cidade||'')}"></div>
+    <div><label>Vidas</label><input id="fx-vidas" type="number" value="${r.total_vidas==null?'':r.total_vidas}"></div>
+    <div><label>Operadora atual</label><input id="fx-op" value="${esc2(r.operadora_atual||'')}"></div>
+    <div><label>Contato (nome)</label><input id="fx-contato" value="${esc2(r.contato_nome||'')}"></div>
+  </div>
+  <div class="f"><label>Observações / histórico do negócio</label>
+  <textarea id="fx-obs" rows="8">${esc2(r.observacoes||'')}</textarea></div>
+  <div style="margin-top:12px;display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn" onclick="salvarFicha()">💾 Salvar alterações</button>
+    ${r.contato_whatsapp?`<a class="btn3" style="text-decoration:none;padding:10px 16px;border-radius:8px;display:inline-flex;align-items:center" target="_blank" href="https://wa.me/55${(r.contato_whatsapp||'').replace(/\D/g,'')}">WhatsApp</a>`:''}
+  </div>
+  <div class="nota-box"><input id="fx-nota" placeholder="Adicionar nota rápida ao histórico (com data e seu nome)…" style="flex:1">
+  <button class="btn2" onclick="addNota()">+ Nota</button></div>
+  <div class="f"><label>Nova interação registrada</label>
+  <div style="display:flex;gap:8px"><select id="fx-tipo" style="width:130px"><option>Ligação</option><option>Reunião</option><option>WhatsApp</option><option>E-mail</option><option>Proposta</option><option>Visita</option></select>
+  <input id="fx-inter" placeholder="O que aconteceu…" style="flex:1"><button class="btn2" onclick="addInter()">Registrar</button></div></div>
+  ${histHTML?'<div class="f"><label>Histórico</label><div class="hist">'+histHTML+'</div></div>':''}
+  ${contHTML?'<div class="f"><label>Contratos</label><div class="hist">'+contHTML+'</div></div>':''}`;
+  document.getElementById('overlay').style.display='flex';
+}
+function fecharFicha(){document.getElementById('overlay').style.display='none';FICHA=null}
+async function salvarFicha(){
+  const j=await api('update_cliente',{id:FICHA.cliente.id,fields:{
+    status:document.getElementById('fx-status').value,
+    valor_mensal:document.getElementById('fx-valor').value||null,
+    responsavel:document.getElementById('fx-resp').value,
+    contato_whatsapp:document.getElementById('fx-wa').value,
+    cidade:document.getElementById('fx-cidade').value,
+    total_vidas:document.getElementById('fx-vidas').value||null,
+    operadora_atual:document.getElementById('fx-op').value,
+    contato_nome:document.getElementById('fx-contato').value,
+    observacoes:document.getElementById('fx-obs').value}});
+  const ok=document.getElementById('ficha-ok');
+  ok.textContent=j.ok?'Salvo com sucesso ✓':'Erro: '+(j.error||'');ok.style.display='block';
+  if(j.ok){FICHA.cliente.status=document.getElementById('fx-status').value;}
+}
+async function addNota(){
+  const nota=document.getElementById('fx-nota').value.trim();if(!nota)return;
+  const j=await api('add_nota',{id:FICHA.cliente.id,nota});
+  if(j.ok){document.getElementById('fx-nota').value='';document.getElementById('fx-obs').value=j.data;alert('Nota adicionada ao histórico ✓')}
+}
+async function addInter(){
+  const desc=document.getElementById('fx-inter').value.trim();if(!desc)return;
+  const j=await api('add_interacao',{cliente_id:FICHA.cliente.id,cliente_nome:FICHA.cliente.nome,tipo:document.getElementById('fx-tipo').value,descricao:desc,usuario:USER.nome});
+  if(j.ok){abrirFicha(FICHA.cliente.id)}
+}
+
+/* ---------- TAREFAS ---------- */
+let filtroTarefa='pendente';
+async function loadTar(){
+  const c=document.getElementById('conteudo');
+  c.innerHTML=`<h1>✅ Tarefas</h1><div class="subt">Pendências e próximos passos — você e o Luiz atualizam aqui</div>
+  <div class="filtros">
+    <select onchange="filtroTarefa=this.value;listarTar()">
+      <option value="pendente" ${filtroTarefa==='pendente'?'selected':''}>Pendentes</option>
+      <option value="concluida" ${filtroTarefa==='concluida'?'selected':''}>Concluídas</option>
+      <option value="" ${filtroTarefa===''?'selected':''}>Todas</option>
+    </select>
+  </div>
+  <div class="nota-box"><input id="nt-titulo" placeholder="Nova tarefa: o que fazer? (ex: Cobrar retorno do Betinho)" style="flex:1">
+    <select id="nt-resp" style="width:110px"><option>Diniz</option><option>Luiz</option><option>Tim</option></select>
+    <select id="nt-prio" style="width:100px"><option value="media">Média</option><option value="alta">Alta</option><option value="baixa">Baixa</option></select>
+    <input id="nt-prazo" type="date" style="width:140px">
+    <button class="btn2" onclick="novaTarefa()">+ Adicionar</button></div>
+  <div id="tar-lista"><div class="loading">Carregando…</div></div>`;
+  listarTar();
+}
+async function listarTar(){
+  const j=await api('list_tarefas',{status:filtroTarefa});
+  const el=document.getElementById('tar-lista');
+  if(!j.ok){el.innerHTML='<div class="msg-err">Erro</div>';return}
+  el.innerHTML=`<div class="tbl"><table><tr><th style="width:30px"></th><th>Tarefa</th><th>Resp.</th><th>Prio.</th><th>Prazo</th></tr>
+  ${j.data.map(t=>`<tr>
+    <td><input type="checkbox" class="checar" ${t.status==='concluida'?'checked':''} onchange="toggleTarefa('${t.id}','${t.status==='concluida'?'pendente':'concluida'}')"></td>
+    <td class="${t.status==='concluida'?'t-done':''}"><b>${esc2(t.titulo||'')}</b><br><small style="color:#8a9aae">${esc2(t.descricao||'')} ${t.projeto_nome?'· '+esc2(t.projeto_nome):''}</small></td>
+    <td>${esc2(t.responsavel||'—')}</td>
+    <td><span class="prio p-${(t.prioridade||'media')}">${(t.prioridade||'media').toUpperCase()}</span></td>
+    <td>${t.prazo?dt(t.prazo):'—'}</td></tr>`).join('')||'<tr><td colspan="5" class="vazio">Nenhuma tarefa aqui.</td></tr>'}</table></div>`;
+}
+async function novaTarefa(){
+  const titulo=document.getElementById('nt-titulo').value.trim();if(!titulo)return alert('Escreva a tarefa');
+  await api('create_tarefa',{titulo,responsavel:document.getElementById('nt-resp').value,prioridade:document.getElementById('nt-prio').value,prazo:document.getElementById('nt-prazo').value||null,projeto_nome:'CRM'});
+  document.getElementById('nt-titulo').value='';listarTar();
+}
+async function toggleTarefa(id,status){await api('update_tarefa',{id,fields:{status}});listarTar()}
+
+/* ---------- NOVA ENTRADA ---------- */
+async function loadNovo(){
+  const c=document.getElementById('conteudo');
+  c.innerHTML=`<h1>➕ Nova Entrada</h1><div class="subt">Cadastre um novo negócio, lead ou estudo de cotação</div>
+  <div class="msg-ok" id="novo-ok">Negócio criado com sucesso ✓</div>
+  <div class="msg-err" id="novo-err"></div>
+  <div class="grid2 f">
+    <div style="grid-column:1/-1"><label>Nome da empresa / lead *</label><input id="nv-nome"></div>
+    <div><label>Contato (nome)</label><input id="nv-contato"></div>
+    <div><label>WhatsApp</label><input id="nv-wa" placeholder="(11) 9…"></div>
+    <div><label>Cidade</label><input id="nv-cidade"></div>
+    <div><label>Segmento</label><input id="nv-seg" placeholder="Restaurante, clínica, PME…"></div>
+    <div><label>Status</label><select id="nv-status">${STATUS.map(s=>`<option value="${s}" ${s==='PROSPECCAO'?'selected':''}>${LABEL[s]}</option>`).join('')}</select></div>
+    <div><label>Valor mensal estimado (R$)</label><input id="nv-valor" type="number" step="0.01"></div>
+    <div><label>Responsável</label><select id="nv-resp"><option>Diniz e Luiz</option><option>Diniz</option><option>Luiz</option><option>Tim</option></select></div>
+    <div><label>Operadora atual</label><input id="nv-op"></div>
+    <div><label>Vidas</label><input id="nv-vidas" type="number"></div>
+    <div style="grid-column:1/-1"><label>Observações (produto, contexto, valores…)</label><textarea id="nv-obs" rows="5"></textarea></div>
+  </div>
+  <div style="margin-top:14px"><button class="btn" onclick="criarCliente()">💾 Criar negócio</button></div>`;
+}
+async function criarCliente(){
+  const nome=document.getElementById('nv-nome').value.trim();if(!nome)return alert('Informe o nome');
+  const j=await api('create_cliente',{nome,contato_nome:document.getElementById('nv-contato').value,contato_whatsapp:document.getElementById('nv-wa').value,cidade:document.getElementById('nv-cidade').value,segmento:document.getElementById('nv-seg').value,status:document.getElementById('nv-status').value,valor_mensal:document.getElementById('nv-valor').value||null,responsavel:document.getElementById('nv-resp').value,operadora_atual:document.getElementById('nv-op').value,total_vidas:document.getElementById('nv-vidas').value||null,observacoes:document.getElementById('nv-obs').value});
+  if(j.ok){document.getElementById('novo-ok').style.display='block';document.getElementById('novo-err').style.display='none';setTimeout(()=>{pagina('neg')},600)}
+  else{const e=document.getElementById('novo-err');e.textContent=j.error||'Erro';e.style.display='block'}
+}
+
+/* ---------- CONFIG ---------- */
+async function loadCfg(){
+  const c=document.getElementById('conteudo');
+  c.innerHTML=`<h1>⚙️ Minha Conta</h1><div class="subt">${esc2(USER.nome)} · ${USER.perfil==='admin'?'Administrador':'Vendedor'}</div>
+  <div class="msg-ok" id="cfg-ok"></div><div class="msg-err" id="cfg-err"></div>
+  <div class="f" style="max-width:420px">
+    <label>Senha atual</label><input id="cfg-atual" type="password">
+    <label>Nova senha</label><input id="cfg-nova" type="password">
+    <div style="margin-top:14px"><button class="btn" onclick="trocarSenha()">Trocar senha</button></div>
+  </div>`;
+}
+async function trocarSenha(){
+  const j=await api('change_password',{current:document.getElementById('cfg-atual').value,newpass:document.getElementById('cfg-nova').value});
+  const ok=document.getElementById('cfg-ok'),err=document.getElementById('cfg-err');
+  if(j.ok){ok.textContent='Senha alterada ✓';ok.style.display='block';err.style.display='none'}
+  else{err.textContent=j.error||'Erro';err.style.display='block';ok.style.display='none'}
+}
+iniciar();
+</script>
+</body>
+</html>
